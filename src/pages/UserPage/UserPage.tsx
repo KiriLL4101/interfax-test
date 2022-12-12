@@ -2,26 +2,32 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 
 import { fetchAuthorInfo, searchRepositoriesByLogin } from '../../api/githubService'
+import { Loader } from '../../components/Loader'
 import { RepositoryCard } from '../../components/RepositoryItem'
 
 import * as styles from './UserPage.module.scss'
 
-const UserPage = () => {
-  const { login } = useParams()
-
+export const UserPage = () => {
   const [user, setUser] = useState<GitHubUserInfo | null>(null)
   const [repositoryData, setRepositoryData] = useState<RepositoryItem[]>()
+  const [isLoading, setIsLoading] = useState(true)
+
+  const { login } = useParams()
 
   const fetchUserData = async (login: string) => {
+    setIsLoading(true)
     try {
-      const response = await fetchAuthorInfo(login)
-      setUser(response)
+      const resUser = await fetchAuthorInfo(login)
+      const resRepositories = await searchRepositoriesByLogin(login)
+
+      setUser(resUser)
+      setRepositoryData(resRepositories)
     } catch (error) {
       setUser(null)
-      return
+      // notification(error)
+    } finally {
+      setIsLoading(false)
     }
-    const response = await searchRepositoriesByLogin(login)
-    setRepositoryData(response)
   }
 
   useEffect(() => {
@@ -47,14 +53,18 @@ const UserPage = () => {
         </div>
       ) : (
         <div className={styles.notFound}>
-          <span>User not found</span>
-          <Link to={'/'} className={styles.back}>
-            Back
-          </Link>
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <>
+              <span>User not found</span>
+              <Link to={'/'} className={styles.back}>
+                Back
+              </Link>
+            </>
+          )}
         </div>
       )}
     </>
   )
 }
-
-export default UserPage

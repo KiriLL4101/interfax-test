@@ -11,3 +11,13 @@ export const fetchAuthorInfo = (profile: string): Promise<GitHubUserInfo> => {
     throw new Error(res.statusText || 'Status code error :' + res.status)
   })
 }
+
+export const getCommitsByRepositoriesName = (
+  login: string,
+  name: string,
+): Promise<CommitInfo[]> => {
+  return fetch(`https://api.github.com/repos/${login}/${name}/commits`).then((res) => {
+    if (res.ok) return res.json()
+    throw new Error(res.statusText || 'Status code error :' + res.status)
+  })
+}
