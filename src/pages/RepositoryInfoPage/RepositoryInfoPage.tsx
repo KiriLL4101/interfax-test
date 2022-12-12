@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { getCommitsByRepositoriesName } from '../../api/githubService'
 import { Loader } from '../../components/Loader'
+import { formatDate } from '../../utils'
 
 import * as styles from './RepositoryInfoPage.module.scss'
 
@@ -39,18 +40,23 @@ export const RepositoryInfoPage = () => {
       </div>
       <ul className={styles.list}>
         {commits && !isLoading ? (
-          commits.map((com) => (
-            <li key={com.sha} className={styles.commit}>
-              <a href={`${com.html_url}`} target="_blank">
-                {com.sha}
-              </a>
-              <div>
-                {com?.author?.avatar_url && <img src={com.author.avatar_url} alt="Avatar" />}
-                {com?.author?.login && <span>{com.author.login}</span>}
-                committed <span>{com.commit.committer.date}</span>
-              </div>
-            </li>
-          ))
+          commits.map((com) => {
+            const { avatar_url, login } = com.author
+            const dateFormatted = formatDate(new Date(com.commit.committer.date).getTime())
+
+            return (
+              <li key={com.sha} className={styles.commit}>
+                <a href={`${com.html_url}`} target="_blank">
+                  {com.sha}
+                </a>
+                <div>
+                  {avatar_url && <img src={avatar_url} alt="Avatar" />}
+                  {login && <span>{login}</span>}
+                  committed <span>{dateFormatted}</span>
+                </div>
+              </li>
+            )
+          })
         ) : (
           <Loader />
         )}

@@ -28,12 +28,11 @@
 .wrap {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
   gap: 10px;
   justify-items: center;
   overflow-y: scroll;
   height: 100vh;
-  width: fit-content;
+  align-content: baseline;
   padding-right: 10px;
 
   &::-webkit-scrollbar {
